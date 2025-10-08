@@ -1,8 +1,8 @@
 package fetch
 
 import (
-	event2 "betcorgi-event-indexer/cmd/indexer/event"
 	"betcorgi-event-indexer/model"
+	event2 "betcorgi-event-indexer/monitor/event"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"

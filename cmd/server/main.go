@@ -27,7 +27,8 @@ func main() {
 	// 创建限速器,每秒5次
 	limiter := tollbooth.NewLimiter(5, nil)
 	// 使用限速中间件
-	router.GET("/history", tollbooth_gin.LimitHandler(limiter), service.BridgeTx)
+	router.GET("/bet", tollbooth_gin.LimitHandler(limiter), service.EventBet)
+	router.GET("/draw", tollbooth_gin.LimitHandler(limiter), service.EventDraw)
 	router.GET("/healthy", tollbooth_gin.LimitHandler(limiter), service.Healthy)
 	addr := os.Getenv("LISTEN_ADDR")
 	if len(addr) == 0 {

@@ -1,7 +1,7 @@
 package ws
 
 import (
-	event2 "betcorgi-event-indexer/cmd/indexer/event"
+	event2 "betcorgi-event-indexer/monitor/event"
 	"log"
 	"time"
 

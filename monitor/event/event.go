@@ -25,27 +25,13 @@ type BetPlaced struct {
 	Data    []byte
 }
 
-type AutoBetPlaced struct {
+type DrawEvent struct {
+	GameID      uint64
 	Player      [32]byte
 	OrderID     uint64
-	GameID      uint64
 	Amount      uint64
-	ProfitStop  uint64
-	LostStop    uint64
-	AddWhenWin  uint8
-	AddWhenLose uint8
-	Hash        string
-	Data        []byte
-}
-
-type WithdrawExecuted struct {
-	Withdrawer [32]byte
-	Amount     uint64
-}
-
-type AuthorizedPubkeyUpdated struct {
-	OldPubkey [32]byte
-	NewPubkey [32]byte
+	Seed        string
+	HashExpired bool
 }
 
 // ------------------ 注册机制 ------------------
@@ -66,16 +52,8 @@ func init() {
 		var e BetPlaced
 		return &e, borsh.Deserialize(&e, data)
 	})
-	registerEvent("AutoBetPlaced", func(data []byte) (Event, error) {
-		var e AutoBetPlaced
-		return &e, borsh.Deserialize(&e, data)
-	})
-	registerEvent("WithdrawExecuted", func(data []byte) (Event, error) {
-		var e WithdrawExecuted
-		return &e, borsh.Deserialize(&e, data)
-	})
-	registerEvent("AuthorizedPubkeyUpdated", func(data []byte) (Event, error) {
-		var e AuthorizedPubkeyUpdated
+	registerEvent("DrawEvent", func(data []byte) (Event, error) {
+		var e DrawEvent
 		return &e, borsh.Deserialize(&e, data)
 	})
 }
@@ -154,13 +132,29 @@ func handleProgramData(dataB64 string, seen map[string]struct{}, signature strin
 		}
 		b, _ := json.MarshalIndent(event, "", "  ")
 		log.Printf("🎯 事件 %x 解码成功:\n%s\n", discriminator, string(b)) // 保存到数据库
-		playerStr := decodePlayer(event.(*BetPlaced))
-		log.Printf("Player: %s", playerStr)
 		log.Printf("discriminator: %x", discriminator)
 		err = model.SaveEventToDB(signature, slot, discriminator, payload)
 		if err != nil {
 			log.Println("SaveEventToDB：", err)
-		} // signature/slot实际可替换
+			return
+		}
+		if discriminator == "585891e27ece2000" { // BetPlaced
+			betEvent := event.(*BetPlaced)
+			player := base58.Encode(betEvent.Player[:])
+			err := model.SaveEventBetToDB(betEvent.GameID, betEvent.OrderID, player, fmt.Sprintf("%d", betEvent.Amount), betEvent.Hash, fmt.Sprintf("%x", betEvent.Data), signature)
+			if err != nil {
+				log.Println("SaveEventBetToDB：", err)
+				return
+			}
+		} else if discriminator == "e86e28b168b9313b" { // DrawEvent
+			drawEvent := event.(*DrawEvent)
+			player := base58.Encode(drawEvent.Player[:])
+			err := model.SaveEventDrawToDB(drawEvent.GameID, drawEvent.OrderID, player, fmt.Sprintf("%d", drawEvent.Amount), drawEvent.Seed, signature, drawEvent.HashExpired)
+			if err != nil {
+				log.Println("SaveEventDrawToDB：", err)
+				return
+			}
+		}
 	} else {
 		log.Printf("⚠️ 未知事件 discriminator: %x", discriminator)
 	}
