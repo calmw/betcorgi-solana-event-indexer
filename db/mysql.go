@@ -19,7 +19,7 @@ func InitMysql() {
 	var password = os.Getenv("MYSQL_PASSWORD")
 	var host = os.Getenv("MYSQL_HOST")
 	var port = os.Getenv("MYSQL_PORT")
-	var database = os.Getenv("MYSQL_DATABASE")
+	var database = "corgibet_solana"
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		userName,
 		password,

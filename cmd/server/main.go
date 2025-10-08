@@ -18,7 +18,7 @@ func main() {
 	db.InitMysql()
 
 	//自动迁移
-	err := db.DB.Set("gorm:table_options", "CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci").AutoMigrate(&model.ChainInfo{}, &model.BridgeTx{}, &model.ResourceInfo{}, &model.TokenInfo{}, &model.DailyReport{})
+	err := db.DB.Set("gorm:table_options", "CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci").AutoMigrate(&model.Event{})
 	if err != nil {
 		log.Println("db AutoMigrate err: ", err)
 	}
