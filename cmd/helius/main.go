@@ -142,6 +142,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 // ------------------- Main -------------------
 
 func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		_, err := fmt.Fprintln(w, "Hello, World!")
+		if err != nil {
+			log.Println(err)
+		}
+	})
 	http.HandleFunc("/webhook", handler)
 	fmt.Println("Listening on :8080 ...")
 	err := http.ListenAndServe(":8080", nil)
