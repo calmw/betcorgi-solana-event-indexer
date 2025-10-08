@@ -36,6 +36,9 @@ func EventDraw(c *gin.Context) {
 	if len(q.Signature) > 0 {
 		tx = tx.Where("signature=?", strings.ToLower(q.Signature))
 	}
+	if q.OrderId > 0 {
+		tx = tx.Where("order_id=?", q.OrderId)
+	}
 	tx.Count(&total)
 	err := tx.Offset(offset).Order("order_id DESC, created_at DESC").Limit(pageSize).Find(&records).Error
 	if err != nil {

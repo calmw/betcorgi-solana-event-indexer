@@ -11,6 +11,7 @@ import (
 type Query struct {
 	PageNum   int    `form:"page_num"`
 	PageSize  int    `form:"page_size"`
+	OrderId   uint64 `form:"order_id"`
 	Signature string `form:"signature"`
 }
 
@@ -41,6 +42,9 @@ func EventBet(c *gin.Context) {
 
 	if len(q.Signature) > 0 {
 		tx = tx.Where("signature=?", strings.ToLower(q.Signature))
+	}
+	if q.OrderId > 0 {
+		tx = tx.Where("order_id=?", q.OrderId)
 	}
 	tx.Count(&total)
 	err := tx.Offset(offset).Order("order_id DESC, created_at DESC").Limit(pageSize).Find(&records).Error

@@ -3,30 +3,22 @@
 version: '3.9'
 
 networks:
-  tt_bridge:
+  solana_indexer:
 
 services:
 
-  tt_bridge_one:
-    image: harbor.devops.tantin.com/chain/tt_bridge:0.4.1
-    container_name: tt_bridge_one
+  indexer:
+    image: calmw/betcorgi_solana_indexer:0.0.1
+    container_name: solana_indexer
     restart: always
     environment:
-      - TRON_API_KEY=49d96339-a7e5-48b7-bf15-ee511bb8da41
-      - FAILED_JOB_INTERVAL=300
-      - MYSQL_DATABASE=bridge
+      - MYSQL_DATABASE=corgibet_solana
       - MYSQL_USERNAME=root
       - MYSQL_PASSWORD=let_me_in_0x4f7d21e8ed
-      - MYSQL_HOST=tt_bridge_mysql
+      - MYSQL_HOST=solana_indexer_mysql
       - MYSQL_PORT=3306
-      - REDIS_HOST=tt_bridge_redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=
-    volumes:
-      - ./:/app
     networks:
-      - tt_bridge
-    command: tail -f /dev/null
+      - solana_indexer
     logging:
       driver: "json-file"
       options:
@@ -38,57 +30,20 @@ services:
           cpus: '1'
           memory: 2G
 
-  tt_bridge_two:
-    image: harbor.devops.tantin.com/chain/tt_bridge:0.4.1
-    container_name: tt_bridge_two
+  indexer_api:
+    image: calmw/betcorgi_solana_indexer_api:0.0.1
+    container_name: solana_indexer_two
     restart: always
     environment:
-      - TRON_API_KEY=49d96339-a7e5-48b7-bf15-ee511bb8da41
-      - FAILED_JOB_INTERVAL=300
-      - MYSQL_DATABASE=bridge
+      - MYSQL_DATABASE=corgibet_solana
       - MYSQL_USERNAME=root
       - MYSQL_PASSWORD=let_me_in_0x4f7d21e8ed
-      - MYSQL_HOST=tt_bridge_mysql
+      - MYSQL_HOST=solana_indexer_mysql
       - MYSQL_PORT=3306
-      - REDIS_HOST=tt_bridge_redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=
-    volumes:
-      - ./:/app
+    ports:
+      - "8086:8080"
     networks:
-      - tt_bridge
-    command: tail -f /dev/null
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "1"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 2G
-
-  tt_bridge_three:
-    image: harbor.devops.tantin.com/chain/tt_bridge:0.4.1
-    container_name: tt_bridge_three
-    restart: always
-    environment:
-      - TRON_API_KEY=49d96339-a7e5-48b7-bf15-ee511bb8da41
-      - FAILED_JOB_INTERVAL=300
-      - MYSQL_DATABASE=bridge
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=let_me_in_0x4f7d21e8ed
-      - MYSQL_HOST=tt_bridge_mysql
-      - MYSQL_PORT=3306
-      - REDIS_HOST=tt_bridge_redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=
-    volumes:
-      - ./:/app
-    networks:
-      - tt_bridge
-    command: tail -f /dev/null
+      - solana_indexer
     logging:
       driver: "json-file"
       options:
@@ -102,7 +57,7 @@ services:
 
   mysql:
     image: mysql:latest
-    container_name: tt_bridge_mysql
+    container_name: solana_indexer_mysql
     restart: always
     ports:
       - "3306:3306"
@@ -113,7 +68,7 @@ services:
       - ./mysql_data/data:/var/lib/mysql
       - ./mysql_data/conf:/etc/mysql/conf.d/
     networks:
-      - tt_bridge
+      - solana_indexer
     logging:
       driver: "json-file"
       options:
@@ -124,67 +79,3 @@ services:
         limits:
           cpus: '1'
           memory: 2G
-
-  tt_bridge_api:
-    image: harbor.devops.tantin.com/chain/tt_bridge_api:0.2.5
-    container_name: tt_bridge_api
-    restart: always
-    ports:
-      - "8080:8080"
-    environment:
-      - LISTEN_ADDR=0.0.0.0:8080
-      - MYSQL_DATABASE=bridge
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=let_me_in_0x4f7d21e8ed
-      - MYSQL_HOST=tt_bridge_mysql
-      - MYSQL_PORT=3306
-    volumes:
-      - ./:/app
-    networks:
-      - tt_bridge
-    command: tail -f /dev/null
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "1"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 2G
-
-  tt_bridge_dfr: # 财务统计报告
-    image: harbor.devops.tantin.com/chain/tt_bridge_dfr:0.2.1
-    container_name: tt_bridge_dfr
-    restart: always
-    environment:
-      - LISTEN_ADDR=0.0.0.0:8080
-      - MYSQL_DATABASE=bridge
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=let_me_in_0x4f7d21e8ed
-      - MYSQL_HOST=tt_bridge_mysql
-      - MYSQL_PORT=3306
-    volumes:
-      - ./:/app
-    networks:
-      - tt_bridge
-    command: tail -f /dev/null
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "1"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 2G
-
-  redis:
-    image: redis:7
-    container_name: tt_bridge_redis
-    ports:
-      - "6379:6379"
-    networks:
-      - tt_bridge
