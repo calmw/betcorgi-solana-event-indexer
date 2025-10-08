@@ -157,7 +157,10 @@ func handleProgramData(dataB64 string, seen map[string]struct{}, signature strin
 		playerStr := decodePlayer(event.(*BetPlaced))
 		log.Printf("Player: %s", playerStr)
 		log.Printf("discriminator: %x", discriminator)
-		model.SaveEventToDB(signature, slot, discriminator, payload) // signature/slot实际可替换
+		err = model.SaveEventToDB(signature, slot, discriminator, payload)
+		if err != nil {
+			log.Println("SaveEventToDB：", err)
+		} // signature/slot实际可替换
 	} else {
 		log.Printf("⚠️ 未知事件 discriminator: %x", discriminator)
 	}
