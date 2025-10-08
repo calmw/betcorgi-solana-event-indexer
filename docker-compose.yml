@@ -8,10 +8,13 @@ networks:
 services:
 
   indexer:
-    image: calmw/betcorgi_solana_indexer:0.0.1
+    image: calmw/betcorgi_solana_indexer:0.0.2
     container_name: solana_indexer
     restart: always
     environment:
+      - PROGRAM_ID=FmoviYkRguNDJwX5vuj4NVPsy5Tzf9kZK23x6VTiE8P
+      - RPC_WS=wss://api.devnet.solana.com
+      - RPC_URL=https://api.devnet.solana.com
       - MYSQL_DATABASE=corgibet_solana
       - MYSQL_USERNAME=root
       - MYSQL_PASSWORD=let_me_in_0x4f7d21e8ed
@@ -31,8 +34,8 @@ services:
           memory: 2G
 
   indexer_api:
-    image: calmw/betcorgi_solana_indexer_api:0.0.1
-    container_name: solana_indexer_two
+    image: calmw/betcorgi_solana_indexer_api:0.0.3
+    container_name: solana_indexer_api
     restart: always
     environment:
       - MYSQL_DATABASE=corgibet_solana
@@ -63,7 +66,7 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=let_me_in_0x4f7d21e8ed
-      - MYSQL_DATABASE=bridge
+      - MYSQL_DATABASE=corgibet_solana
     volumes:
       - ./mysql_data/data:/var/lib/mysql
       - ./mysql_data/conf:/etc/mysql/conf.d/

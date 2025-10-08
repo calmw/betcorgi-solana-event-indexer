@@ -6,6 +6,7 @@ import (
 	"betcorgi-event-indexer/monitor/fetch"
 	"betcorgi-event-indexer/monitor/ws"
 	"log"
+	"os"
 	"time"
 )
 
@@ -17,12 +18,15 @@ func main() {
 	if err != nil {
 		log.Println("db AutoMigrate err: ", err)
 	}
+	RpcWs := os.Getenv("RPC_WS")
+	RpcUrl := os.Getenv("RPC_URL")
+	ProgramId := os.Getenv("PROGRAM_ID")
 
-	go ws.ListenWS("wss://api.devnet.solana.com", "FmoviYkRguNDJwX5vuj4NVPsy5Tzf9kZK23x6VTiE8P")
+	go ws.ListenWS(RpcWs, ProgramId)
 
 	// 补漏，每30秒通过RPC检查一次
 	for {
-		fetch.FetchMissingEvents("https://api.devnet.solana.com", "FmoviYkRguNDJwX5vuj4NVPsy5Tzf9kZK23x6VTiE8P")
+		fetch.FetchMissingEvents(RpcUrl, ProgramId)
 		time.Sleep(30 * time.Second)
 	}
 }
