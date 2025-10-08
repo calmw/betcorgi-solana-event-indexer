@@ -43,7 +43,7 @@ func EventBet(c *gin.Context) {
 		tx = tx.Where("signature=?", strings.ToLower(q.Signature))
 	}
 	tx.Count(&total)
-	err := tx.Offset(offset).Order("created_at DESC").Limit(pageSize).Find(&records).Error
+	err := tx.Offset(offset).Order("order_id DESC, created_at DESC").Limit(pageSize).Find(&records).Error
 	if err != nil {
 		c.JSON(200, gin.H{
 			"code": 1,
