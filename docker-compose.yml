@@ -8,9 +8,11 @@ networks:
 services:
 
   indexer:
-    image: calmw/betcorgi_solana_indexer:0.0.3
+    image: calmw/betcorgi_solana_indexer:0.0.4
     container_name: solana_indexer
     restart: always
+    depends_on:
+      - mysql
     environment:
       - PROGRAM_ID=FmoviYkRguNDJwX5vuj4NVPsy5Tzf9kZK23x6VTiE8P
       - RPC_WS=wss://api.devnet.solana.com
@@ -37,6 +39,8 @@ services:
     image: calmw/betcorgi_solana_indexer_api:0.0.2
     container_name: solana_indexer_api
     restart: always
+    depends_on:
+      - mysql
     environment:
       - MYSQL_DATABASE=corgibet_solana
       - MYSQL_USERNAME=root

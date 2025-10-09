@@ -21,6 +21,9 @@ func main() {
 	RpcWs := os.Getenv("RPC_WS")
 	RpcUrl := os.Getenv("RPC_URL")
 	ProgramId := os.Getenv("PROGRAM_ID")
+	log.Println("RPC_WS", RpcWs)
+	log.Println("RPC_URL", RpcUrl)
+	log.Println("PROGRAM_ID", ProgramId)
 
 	go ws.ListenWS(RpcWs, ProgramId)
 

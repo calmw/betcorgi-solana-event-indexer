@@ -2,7 +2,7 @@
 
 ``` shell
 # indexer 
-docker buildx build --platform linux/amd64 --tag calmw/betcorgi_solana_indexer:0.0.3 --push .
+docker buildx build --platform linux/amd64 --tag calmw/betcorgi_solana_indexer:0.0.4 --push .
 ```
 
 ``` shell
