@@ -4,7 +4,7 @@ import (
 	"betcorgi-event-indexer/model"
 	event2 "betcorgi-event-indexer/monitor/event"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -113,6 +113,8 @@ func jsonPost(url string, data interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
+	return io.ReadAll(resp.Body)
 }
