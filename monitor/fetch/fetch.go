@@ -3,9 +3,7 @@ package fetch
 import (
 	"betcorgi-event-indexer/model"
 	event2 "betcorgi-event-indexer/monitor/event"
-	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -102,24 +100,7 @@ func FetchMissingEvents(rpcURL, programID string) {
 		for _, logLine := range txResp.Result.Meta.LogMessages {
 			if strings.HasPrefix(logLine, "Program data: ") {
 				dataB64 := strings.TrimPrefix(logLine, "Program data: ")
-				raw, err := base64.StdEncoding.DecodeString(dataB64)
-				if err != nil || len(raw) <= 8 {
-					continue
-				}
-
-				discriminator := fmt.Sprintf("%x", raw[:8])
-				payload := raw[8:]
-
-				if decoder, ok := event2.EventRegistry[discriminator]; ok {
-					_, err := decoder(payload)
-					if err != nil {
-						log.Println("⚠️ 解析失败:", err)
-						continue
-					}
-
-					log.Printf("💾 补漏事件: slot=%d, sig=%s", slot, signature)
-					model.SaveEventToDB(signature, slot, discriminator, payload)
-				}
+				event2.HandleProgramData(dataB64, signature, slot)
 			}
 		}
 	}

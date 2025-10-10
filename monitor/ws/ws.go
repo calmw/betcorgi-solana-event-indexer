@@ -9,7 +9,6 @@ import (
 )
 
 func ListenWS(rpcWS, programID string) {
-	seen := map[string]struct{}{}
 
 	for {
 		conn, _, err := websocket.DefaultDialer.Dial(rpcWS, nil)
@@ -30,7 +29,7 @@ func ListenWS(rpcWS, programID string) {
 		}
 		if err := conn.WriteJSON(subMsg); err != nil {
 			log.Println("订阅失败:", err)
-			conn.Close()
+			_ = conn.Close()
 			time.Sleep(5 * time.Second)
 			continue
 		}
@@ -41,10 +40,10 @@ func ListenWS(rpcWS, programID string) {
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
 				log.Println("⚠️ WS断开，重连中:", err)
-				conn.Close()
+				_ = conn.Close()
 				break
 			}
-			event2.ExtractAndHandle(msg, seen)
+			event2.ExtractAndHandle(msg)
 		}
 	}
 }

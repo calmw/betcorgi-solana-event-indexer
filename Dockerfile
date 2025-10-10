@@ -4,11 +4,11 @@ ADD . /app
 ENV GO111MODULE=on
 ENV GOPROXY=https://goproxy.cn
 RUN go mod tidy
-RUN go build -o /solana_indexer cmd/indexer/main.go
+RUN go build -o /solana_indexer_api cmd/server/main.go
 
 FROM golang
 WORKDIR /app
-COPY --from=builder /solana_indexer /
-RUN chmod +x /solana_indexer
+COPY --from=builder /solana_indexer_api /
+RUN chmod +x /solana_indexer_api
 
-ENTRYPOINT ["/solana_indexer"]
+ENTRYPOINT ["/solana_indexer_api"]

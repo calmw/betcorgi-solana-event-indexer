@@ -36,6 +36,8 @@ type DrawEvent struct {
 
 // ------------------ 注册机制 ------------------
 
+var Seen = map[string]struct{}{}
+
 type EventDecoder func([]byte) (Event, error)
 
 var EventRegistry = map[string]EventDecoder{}
@@ -64,8 +66,8 @@ func MarshalEvent(event Event) string {
 	return string(b)
 }
 
-// ------------------ 工具函数 ------------------
-func ExtractAndHandle(msg []byte, seen map[string]struct{}) {
+// ExtractAndHandle ------------------ 工具函数 ------------------
+func ExtractAndHandle(msg []byte) {
 	var rawMsg map[string]interface{}
 	if err := json.Unmarshal(msg, &rawMsg); err != nil {
 		return
@@ -104,12 +106,12 @@ func ExtractAndHandle(msg []byte, seen map[string]struct{}) {
 		const prefix = "Program data: "
 		if len(line) > len(prefix) && line[:len(prefix)] == prefix {
 			dataB64 := line[len(prefix):]
-			handleProgramData(dataB64, seen, signature, slot)
+			HandleProgramData(dataB64, signature, slot)
 		}
 	}
 }
 
-func handleProgramData(dataB64 string, seen map[string]struct{}, signature string, slot uint64) {
+func HandleProgramData(dataB64 string, signature string, slot uint64) {
 	raw, err := base64.StdEncoding.DecodeString(dataB64)
 	if err != nil || len(raw) <= 8 {
 		return
@@ -117,10 +119,10 @@ func handleProgramData(dataB64 string, seen map[string]struct{}, signature strin
 
 	discriminator := fmt.Sprintf("%x", raw[:8])
 	key := fmt.Sprintf("%s:%x", signature, raw[:8])
-	if _, ok := seen[key]; ok {
+	if _, ok := Seen[key]; ok {
 		return
 	}
-	seen[key] = struct{}{}
+	Seen[key] = struct{}{}
 
 	payload := raw[8:]
 
@@ -141,7 +143,7 @@ func handleProgramData(dataB64 string, seen map[string]struct{}, signature strin
 		if discriminator == "585891e27ece2000" { // BetPlaced
 			betEvent := event.(*BetPlaced)
 			player := base58.Encode(betEvent.Player[:])
-			err := model.SaveEventBetToDB(betEvent.GameID, betEvent.OrderID, player, fmt.Sprintf("%d", betEvent.Amount), betEvent.Hash, fmt.Sprintf("%x", betEvent.Data), signature)
+			err := model.SaveEventBetToDB(betEvent.GameID, betEvent.OrderID, player, fmt.Sprintf("%d", betEvent.Amount), betEvent.Hash, string(betEvent.Data), signature)
 			if err != nil {
 				log.Println("SaveEventBetToDB：", err)
 				return
@@ -158,8 +160,4 @@ func handleProgramData(dataB64 string, seen map[string]struct{}, signature strin
 	} else {
 		log.Printf("⚠️ 未知事件 discriminator: %x", discriminator)
 	}
-}
-
-func decodePlayer(event *BetPlaced) string {
-	return base58.Encode(event.Player[:])
 }
