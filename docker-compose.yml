@@ -36,7 +36,7 @@ services:
           memory: 2G
 
   indexer_api:
-    image: calmw/betcorgi_solana_indexer_api:0.0.2
+    image: calmw/betcorgi_solana_indexer_api:0.0.3
     container_name: solana_indexer_api
     restart: always
     depends_on:
