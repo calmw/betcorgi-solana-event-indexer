@@ -3,12 +3,12 @@ package model
 import (
 	"betcorgi-event-indexer/db"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type EventBet struct {
-	gorm.Model
 	Id        uint64 `gorm:"primaryKey" json:"id"`
 	GameId    uint64 `gorm:"column:game_id;comment:'game_id'" json:"game_id"`
 	OrderId   uint64 `gorm:"column:order_id;comment:'order_id'" json:"order_id"`
@@ -17,6 +17,9 @@ type EventBet struct {
 	Hash      string `gorm:"column:hash;type:varchar(100);comment:'hash'" json:"hash"`
 	Data      string `gorm:"column:data;type:varchar(500);comment:'data'" json:"data"`
 	Signature string `gorm:"uniqueIndex;column:signature;type:varchar(100);comment:'signature'" json:"signature"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func SaveEventBetToDB(gameId, orderId uint64, player, amount, hash, data, sig string) error {

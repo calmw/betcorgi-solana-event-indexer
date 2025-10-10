@@ -11,7 +11,9 @@ import (
 type Query struct {
 	PageNum   int    `form:"page_num"`
 	PageSize  int    `form:"page_size"`
+	GameId    int    `form:"game_id"`
 	OrderId   uint64 `form:"order_id"`
+	Player    string `form:"player"`
 	Signature string `form:"signature"`
 }
 
@@ -42,6 +44,12 @@ func EventBet(c *gin.Context) {
 
 	if len(q.Signature) > 0 {
 		tx = tx.Where("signature=?", strings.ToLower(q.Signature))
+	}
+	if q.GameId > 0 {
+		tx = tx.Where("game_id=?", q.GameId)
+	}
+	if len(q.Player) > 0 {
+		tx = tx.Where("player=?", q.Player)
 	}
 	if q.OrderId > 0 {
 		tx = tx.Where("order_id=?", q.OrderId)

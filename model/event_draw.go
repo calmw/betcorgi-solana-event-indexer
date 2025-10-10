@@ -3,12 +3,12 @@ package model
 import (
 	"betcorgi-event-indexer/db"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type EventDraw struct {
-	gorm.Model
 	Id          uint64 `gorm:"primaryKey" json:"id"`
 	GameID      uint64 `gorm:"column:game_id;comment:'game_id'" json:"game_id"`
 	OrderId     uint64 `gorm:"column:order_id;comment:'order_id'" json:"order_id"`
@@ -17,6 +17,9 @@ type EventDraw struct {
 	HashExpired bool   `gorm:"column:hash_expired;type:varchar(100);comment:'hash_expired'" json:"hash_expired"`
 	Seed        string `gorm:"column:seed;type:varchar(500);comment:'seed'" json:"seed"`
 	Signature   string `gorm:"uniqueIndex;column:signature;type:varchar(100);comment:'signature'" json:"signature"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
 
 func SaveEventDrawToDB(gameId, orderId uint64, player, amount, seed, sig string, hashExpired bool) error {

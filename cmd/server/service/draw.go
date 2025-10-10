@@ -36,6 +36,12 @@ func EventDraw(c *gin.Context) {
 	if len(q.Signature) > 0 {
 		tx = tx.Where("signature=?", strings.ToLower(q.Signature))
 	}
+	if q.GameId > 0 {
+		tx = tx.Where("game_id=?", q.GameId)
+	}
+	if len(q.Player) > 0 {
+		tx = tx.Where("player=?", q.Player)
+	}
 	if q.OrderId > 0 {
 		tx = tx.Where("order_id=?", q.OrderId)
 	}
