@@ -143,7 +143,7 @@ func HandleProgramData(dataB64 string, signature string, slot uint64) {
 		if discriminator == "585891e27ece2000" { // BetPlaced
 			betEvent := event.(*BetPlaced)
 			player := base58.Encode(betEvent.Player[:])
-			err := model.SaveEventBetToDB(betEvent.GameID, betEvent.OrderID, player, fmt.Sprintf("%d", betEvent.Amount), betEvent.Hash, string(betEvent.Data), signature)
+			err := model.SaveEventBetToDB(dataB64, betEvent.GameID, betEvent.OrderID, player, fmt.Sprintf("%d", betEvent.Amount), betEvent.Hash, string(betEvent.Data), signature)
 			if err != nil {
 				log.Println("SaveEventBetToDB：", err)
 				return
@@ -151,7 +151,7 @@ func HandleProgramData(dataB64 string, signature string, slot uint64) {
 		} else if discriminator == "e86e28b168b9313b" { // DrawEvent
 			drawEvent := event.(*DrawEvent)
 			player := base58.Encode(drawEvent.Player[:])
-			err := model.SaveEventDrawToDB(drawEvent.GameID, drawEvent.OrderID, player, fmt.Sprintf("%d", drawEvent.Amount), drawEvent.Seed, signature, drawEvent.HashExpired)
+			err := model.SaveEventDrawToDB(dataB64, drawEvent.GameID, drawEvent.OrderID, player, fmt.Sprintf("%d", drawEvent.Amount), drawEvent.Seed, signature, drawEvent.HashExpired)
 			if err != nil {
 				log.Println("SaveEventDrawToDB：", err)
 				return

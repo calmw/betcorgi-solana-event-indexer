@@ -8,7 +8,7 @@ networks:
 services:
 
   indexer:
-    image: calmw/betcorgi_solana_indexer:0.0.5
+    image: calmw/betcorgi_solana_indexer:0.0.6
     container_name: solana_indexer
     restart: always
     depends_on:
@@ -36,7 +36,7 @@ services:
           memory: 2G
 
   indexer_api:
-    image: calmw/betcorgi_solana_indexer_api:0.0.4
+    image: calmw/betcorgi_solana_indexer_api:0.0.5
     container_name: solana_indexer_api
     restart: always
     depends_on:
